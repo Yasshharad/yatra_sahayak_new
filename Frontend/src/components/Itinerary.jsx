@@ -11,6 +11,8 @@ import FlightReturn from './FlightReturn';
 import Trains from './Trains';
 import TrainsReturn from './TrainsReturn';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Itinerary = () => {
     const navigate = useNavigate();
@@ -91,6 +93,12 @@ const Itinerary = () => {
     }
 
     const confirmItinerary = () => {
+        if (!selectedHotel || !selectedRestaurant) {
+            // Show an error notification if hotel or restaurant is not selected
+            toast.error('Please select a hotel and a restaurant before confirming the itinerary.', { autoClose: 3000 });
+            return;
+        }
+
         const selectedHotelPrice = selectedHotel ? selectedHotel.price : 0;
         const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
 
@@ -99,15 +107,20 @@ const Itinerary = () => {
         const totalFoodCost = selectedRestaurantPrice;
         const totalCost = totalTransportationCost + totalHotelCost + totalFoodCost;
 
-        navigate('/confirmed-itinerary', {
-            state: {
-                itineraryData,
-                selectedHotel,
-                selectedRestaurant,
-                totalCost,
-            },
-        });
+        toast.success('confirming the itinerary.', { autoClose: 3000 });
+
+        setTimeout(() => {
+            navigate('/confirmed-itinerary', {
+                state: {
+                    itineraryData,
+                    selectedHotel,
+                    selectedRestaurant,
+                    totalCost,
+                },
+            });
+        }, 4000);
     };
+
 
     const selectedHotelPrice = selectedHotel ? selectedHotel.price : 0;
     const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
@@ -258,16 +271,15 @@ const Itinerary = () => {
             <p>Transportation: {itineraryData?.total_cost.transportation}</p>
             <p>Hotel: {selectedHotel ? selectedHotel.price : 0}</p>
             <p>Food: {selectedRestaurant ? selectedRestaurant.price : 0}</p>
-            {/* <p>Hotel: {itineraryData?.total_cost.hotel}</p>
-            <p>Food: {itineraryData?.total_cost.food}</p> */}
             <p>Total Cost: {totalCost}</p>
 
             <hr />
 
             <div className="link-button1">
-                <a href="/">Generate Again</a> <span />
+                <a href="/plan">Generate Again</a> <span />
                 <button onClick={confirmItinerary} className='download'>Confirm Itinerary</button>
             </div>
+            <ToastContainer />
         </div>
     );
 }

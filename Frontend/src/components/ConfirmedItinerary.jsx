@@ -95,15 +95,18 @@ const ConfirmedItinerary = () => {
 
             {/* Display selected hotel */}
             <h2 className='all-sub-head'>Selected Hotel:</h2>
-            {selectedHotel ? (
-                <Hotels
-                    item={selectedHotel}
-                    isSelected={true}
-                    onSelect={() => { }}
-                />
-            ) : (
-                <p>No hotel selected</p>
-            )}
+            <div>
+                {selectedHotel ? (
+                    <Hotels
+                        item={selectedHotel}
+                        isSelected={true}
+                        onSelect={() => { }}
+                    />
+                ) : (
+                    <p>No hotel selected</p>
+                )}
+            </div>
+
             <hr />
 
             {/* Display selected restaurants */}
@@ -169,7 +172,7 @@ const ConfirmedItinerary = () => {
             <p>Total Cost: {totalCost}</p>
             <hr />
             <div className="link-button1">
-                <a href="/">Generate Again</a> <span />
+                <a href="/plan">Generate Again</a> <span />
                 <button onClick={downloadPDF} className='download'>Download Itinerary (PDF)</button>
             </div>
         </div>
