@@ -561,7 +561,7 @@ class GeneticAlgorithm:
         best_index = fitness_scores.index(best_fitness)
         best_itinerary = population[best_index]
 
-        return best_itinerary, generation
+        return best_itinerary
 
 
 # Input data from the command line argument

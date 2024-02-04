@@ -811,17 +811,16 @@ b {
 /* Loading.css */
 .loading-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
     background-color: rgba(255, 255, 255, 0.8);
-    /* Semi-transparent white background */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 9999;
-    /* Make sure it's on top of other elements */
 }
 
 .loading-container img {
@@ -829,6 +828,10 @@ b {
     /* Adjust the width of the spinner as needed */
     height: 100px;
     /* Adjust the height of the spinner as needed */
+}
+
+.loading-container p {
+    color: #ec726d;
 }
 
 
