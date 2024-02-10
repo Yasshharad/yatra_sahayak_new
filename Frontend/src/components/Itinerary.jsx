@@ -76,17 +76,17 @@ const Itinerary = () => {
     let lowestPriceModeInitial = '';
     let lowestPriceModeReturn = '';
 
-    if (transportationTypes.includes('Bus')) {
+    if (transportationTypes?.includes('Bus')) {
         lowestPriceModeInitial = 'bus';
-    } else if (transportationTypes.includes('Flight')) {
+    } else if (transportationTypes?.includes('Flight')) {
         lowestPriceModeInitial = 'flight';
     } else {
         lowestPriceModeInitial = 'train';
     }
 
-    if (return_transportationTypes.includes('Bus')) {
+    if (return_transportationTypes?.includes('Bus')) {
         lowestPriceModeReturn = 'bus';
-    } else if (return_transportationTypes.includes('Flight')) {
+    } else if (return_transportationTypes?.includes('Flight')) {
         lowestPriceModeReturn = 'flight';
     } else {
         lowestPriceModeReturn = 'train';

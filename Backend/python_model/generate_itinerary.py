@@ -3,10 +3,10 @@
 # import pymongo
 # import random
 # from bson.objectid import ObjectId
+# import copy
 
 # # MongoDB client initialization
-# client = pymongo.MongoClient(
-#     "mongodb+srv://Yatra:Yatra@yatrasahayak.0gw5pwg.mongodb.net/?retryWrites=true&w=majority")
+# client = pymongo.MongoClient("mongodb+srv://Yatra:Yatra@yatrasahayak.0gw5pwg.mongodb.net/?retryWrites=true&w=majority")
 
 # # MongoDB collections
 # attraction_db = client["Attractions"]
@@ -165,6 +165,150 @@
 #         return itinerary
 
 
+# class GeneticAlgorithm:
+#     def __init__(self, model, data, population_size=10,
+#                  generations=20, crossover_probability=0.7, mutation_probability=0.1):
+#         self.model = model
+#         self.data = data
+#         self.population_size = population_size
+#         self.generations = generations
+#         self.crossover_probability = crossover_probability
+#         self.mutation_probability = mutation_probability
+
+#     def initialize_population(self):
+#         population = []
+#         for _ in range(self.population_size):
+#             itinerary = self.model.generate_itinerary(self.data['num_travelers'], self.data['start_location'],
+#                                                       self.data['destination'], self.data['budget'],
+#                                                       self.data['date_of_departure'], self.data['date_of_return'],
+#                                                       self.data['duration_of_stay'], self.data['transportationType'])
+#             population.append(itinerary)
+#         return population
+
+#     def calculate_fitness(self, itinerary):
+#         # Calculate the total cost of the itinerary
+#         total_cost_transportation = 0
+#         total_cost_return_transportation = 0
+#         total_cost_hotel = 0
+#         total_cost_food = 0
+#         total_cost_transportation_both = 0
+
+#         for item in itinerary:
+#             if isinstance(item, dict) and 'price' in item:
+#                 if item in self.model.bus_data + self.model.trains_data + self.model.flights_data:
+#                     total_cost_transportation += item['price'] * self.data["num_travelers"]
+#                 elif item in self.model.hotels_data:
+#                     total_cost_hotel += item['price'] * self.data["num_travelers"] * self.data["duration_of_stay"]
+#                 elif item in self.model.bus_data_return + self.model.trains_data_return + self.model.flights_data_return:
+#                     total_cost_return_transportation += item['price']
+#                 elif item in self.model.restaurants_data:
+#                     total_cost_food += item['price'] * self.data["num_travelers"]
+
+#         total_cost_transportation_both = (
+#                     total_cost_transportation + total_cost_return_transportation) * self.data["num_travelers"]
+#         total_cost = total_cost_transportation_both + total_cost_hotel + total_cost_food
+
+#         # Fitness is the inverse of the cost, as we want to minimize the cost
+#         fitness = 1 / (1 + total_cost)
+#         return fitness
+
+#     def crossover(self, parent1, parent2):
+#         # Randomly choose a crossover point
+#         crossover_point = random.randint(1, min(len(parent1), len(parent2)) - 1)
+
+#         # Create two children by swapping the genetic material of parents at the crossover point
+#         child1 = parent1[:crossover_point] + parent2[crossover_point:]
+#         child2 = parent2[:crossover_point] + parent1[crossover_point:]
+
+#         return child1, child2
+
+#     def mutate(self, itinerary):
+#         mutated_itinerary = copy.deepcopy(itinerary)
+
+#         # Randomly choose an item to mutate
+#         mutation_point = random.randint(0, len(mutated_itinerary) - 1)
+
+#         # Mutate the chosen item (replace it with a new randomly generated item)
+#         mutated_itinerary[mutation_point] = self.model.generate_itinerary(self.data['num_travelers'],
+#                                                                          self.data['start_location'],
+#                                                                          self.data['destination'],
+#                                                                          self.data['budget'],
+#                                                                          self.data['date_of_departure'],
+#                                                                          self.data['date_of_return'],
+#                                                                          self.data['duration_of_stay'],
+#                                                                          self.data['transportationType'])[mutation_point]
+
+#         return mutated_itinerary
+
+#     def select_parents(self, population):
+#         # Tournament selection: Randomly select two individuals, and choose the one with higher fitness
+#         parent1 = random.choice(population)
+#         parent2 = random.choice(population)
+
+#         if self.calculate_fitness(parent1) > self.calculate_fitness(parent2):
+#             return parent1
+#         else:
+#             return parent2
+
+#     def evolve_population(self, population):
+#         new_population = []
+
+#         for _ in range(self.population_size):
+#             # Select parents for crossover
+#             parent1 = self.select_parents(population)
+#             parent2 = self.select_parents(population)
+
+#             # Perform crossover with a certain probability
+#             if random.random() < self.crossover_probability:
+#                 child1, child2 = self.crossover(parent1, parent2)
+#             else:
+#                 # If no crossover, children are identical to parents
+#                 child1, child2 = parent1, parent2
+
+#             # Perform mutation with a certain probability
+#             if random.random() < self.mutation_probability:
+#                 child1 = self.mutate(child1)
+#             if random.random() < self.mutation_probability:
+#                 child2 = self.mutate(child2)
+
+#             # Add the children to the new population
+#             new_population.append(child1)
+#             new_population.append(child2)
+
+#         return new_population
+
+#     def run_genetic_algorithm(self):
+#         # Initialize the initial population
+#         population = self.initialize_population()
+
+#         for generation in range(self.generations):
+#             # Evaluate the fitness of each individual in the population
+#             fitness_scores = [self.calculate_fitness(individual) for individual in population]
+
+#             # Select the best individuals to be parents for the next generation
+#             elite_indices = sorted(range(len(fitness_scores)), key=lambda k: fitness_scores[k], reverse=True)[:2]
+#             elite_parents = [population[i] for i in elite_indices]
+
+#             # Create the next generation using crossover and mutation
+#             population = self.evolve_population(population)
+
+#             # Preserve the elite parents in the new population
+#             population[0] = elite_parents[0]
+#             population[1] = elite_parents[1]
+
+#             # Print the best itinerary and its corresponding cost for each generation
+#             best_fitness = max(fitness_scores)
+#             best_index = fitness_scores.index(best_fitness)
+#             best_itinerary = population[best_index]
+
+#         # Return the best itinerary from the final population
+#         best_fitness = max(fitness_scores)
+#         best_index = fitness_scores.index(best_fitness)
+#         best_itinerary = population[best_index]
+
+#         return best_itinerary
+
+
 # # Input data from the command line argument
 # data = json.loads(sys.argv[1])
 
@@ -178,64 +322,41 @@
 # model = TravelItineraryModel(attractions_data, hotels_data, restaurants_data, bus_data,
 #                                    trains_data, flights_data, bus_data_return, trains_data_return, flights_data_return)
 
-# # Variables to store the best itinerary and its corresponding cost
-# best_itinerary = None
-# best_cost_difference = float('inf')
+# # Initialize the GeneticAlgorithm with the model and data
+# genetic_algorithm = GeneticAlgorithm(model, data)
 
-# # Number of attempts to generate an itinerary
-# max_attempts = 50
+# # Run the genetic algorithm to generate the best itinerary
+# best_itinerary = genetic_algorithm.run_genetic_algorithm()
 
-# for _ in range(max_attempts):
-#     # Generate the itinerary
-#     itinerary = model.generate_itinerary(data['num_travelers'], data['start_location'], data['destination'],
-#                                          data['budget'], data['date_of_departure'], data['date_of_return'], data['duration_of_stay'], data['transportationType'])
+# # Calculate the total cost of the best itinerary
+# total_cost_transportation = 0
+# total_cost_return_transportation = 0
+# total_cost_hotel = 0
+# total_cost_food = 0
 
-#     # Calculate the total cost of the itinerary
-#     total_cost_transportation = 0
-#     total_cost_return_transportation = 0
-#     total_cost_hotel = 0
-#     total_cost_food = 0
-#     total_cost_transportation_both = 0
-#     restaurant_items = []
-#     attractions_items = []
-#     hotels_items = []
+# for item in best_itinerary:
+#     if isinstance(item, dict) and 'price' in item:
+#         if item in bus_data + trains_data + flights_data:
+#             total_cost_transportation += item['price'] * data["num_travelers"]
+#         elif item in hotels_data:
+#             total_cost_hotel += item['price'] * data["num_travelers"] * data["duration_of_stay"]
+#         elif item in bus_data_return + trains_data_return + flights_data_return:
+#             total_cost_return_transportation += item['price']
+#         elif item in restaurants_data:
+#             total_cost_food += item['price'] * data["num_travelers"]
 
-#     for item in itinerary:
-#         if isinstance(item, dict) and 'price' in item:
-#             if item in bus_data + trains_data + flights_data:
-#                 total_cost_transportation += item['price'] * data["num_travelers"]
-#             elif item in hotels_data:
-#                 total_cost_hotel += item['price'] * data["num_travelers"] * data["duration_of_stay"]
-#             elif item in bus_data_return + trains_data_return + flights_data_return:
-#                 total_cost_return_transportation += item['price']
-#             elif item in restaurants_data:
-#                 total_cost_food += item['price'] * data["num_travelers"]
+# total_cost_transportation_both = total_cost_transportation + total_cost_return_transportation
+# # Calculate the total cost
+# total_cost = total_cost_transportation + total_cost_return_transportation + total_cost_hotel + total_cost_food
 
-#     total_cost_transportation_both = (total_cost_transportation + total_cost_return_transportation) * data["num_travelers"]
-#     total_cost = total_cost_transportation_both + total_cost_hotel + total_cost_food
-
-#     # Check if the current itinerary has a cost closer to the budget
-#     cost_difference = abs(total_cost - data['budget'])
-#     if cost_difference < best_cost_difference:
-#         best_cost_difference = cost_difference
-#         best_itinerary = itinerary
-
-#     # Check if the current itinerary is within an acceptable range of the budget
-#     acceptable_range = 0.1 * data['budget']  # 10% of the budget
-#     if cost_difference <= acceptable_range:
-#         break  # Stop the loop if an acceptable itinerary is found
-
-# # If no acceptable itinerary is found, use the best one found during the attempts
-# final_itinerary = best_itinerary
-
-# # Create a dictionary containing the itinerary and calculations
+# # Create a dictionary containing the final itinerary and calculations
 # result = {
 #     'itinerary': {
-#         'transportation': [item for item in final_itinerary if item in bus_data + trains_data + flights_data],
-#         'attractions': [item for item in final_itinerary if item in attractions_data],
-#         'hotels': [item for item in final_itinerary if item in hotels_data],
-#         'restaurants': [item for item in final_itinerary if item in restaurants_data],
-#         'return_transportation': [item for item in final_itinerary if item in bus_data_return + trains_data_return + flights_data_return]
+#         'transportation': [item for item in best_itinerary if item in model.bus_data + model.trains_data + model.flights_data],
+#         'attractions': [item for item in best_itinerary if item in model.attractions_data],
+#         'hotels': [item for item in best_itinerary if item in model.hotels_data],
+#         'restaurants': [item for item in best_itinerary if item in model.restaurants_data],
+#         'return_transportation': [item for item in best_itinerary if item in model.bus_data_return + model.trains_data_return + model.flights_data_return]
 #     },
 #     'total_cost': {
 #         'transportation': total_cost_transportation_both,
@@ -256,8 +377,9 @@ import json
 import sys
 import pymongo
 import random
-from bson.objectid import ObjectId
 import copy
+import math
+from bson.objectid import ObjectId
 
 # MongoDB client initialization
 client = pymongo.MongoClient("mongodb+srv://Yatra:Yatra@yatrasahayak.0gw5pwg.mongodb.net/?retryWrites=true&w=majority")
@@ -419,34 +541,20 @@ class TravelItineraryModel:
         return itinerary
 
 
-class GeneticAlgorithm:
-    def __init__(self, model, data, population_size=10,
-
- generations=20, crossover_probability=0.7, mutation_probability=0.1):
+class SimulatedAnnealing:
+    def __init__(self, model, data, initial_temperature=100, cooling_rate=0.003, num_iterations=1000):
         self.model = model
         self.data = data
-        self.population_size = population_size
-        self.generations = generations
-        self.crossover_probability = crossover_probability
-        self.mutation_probability = mutation_probability
+        self.initial_temperature = initial_temperature
+        self.cooling_rate = cooling_rate
+        self.num_iterations = num_iterations
 
-    def initialize_population(self):
-        population = []
-        for _ in range(self.population_size):
-            itinerary = self.model.generate_itinerary(self.data['num_travelers'], self.data['start_location'],
-                                                      self.data['destination'], self.data['budget'],
-                                                      self.data['date_of_departure'], self.data['date_of_return'],
-                                                      self.data['duration_of_stay'], self.data['transportationType'])
-            population.append(itinerary)
-        return population
-
-    def calculate_fitness(self, itinerary):
+    def calculate_cost(self, itinerary):
         # Calculate the total cost of the itinerary
         total_cost_transportation = 0
         total_cost_return_transportation = 0
         total_cost_hotel = 0
         total_cost_food = 0
-        total_cost_transportation_both = 0
 
         for item in itinerary:
             if isinstance(item, dict) and 'price' in item:
@@ -459,109 +567,80 @@ class GeneticAlgorithm:
                 elif item in self.model.restaurants_data:
                     total_cost_food += item['price'] * self.data["num_travelers"]
 
-        total_cost_transportation_both = (
-                    total_cost_transportation + total_cost_return_transportation) * self.data["num_travelers"]
+        total_cost_transportation_both = total_cost_transportation + total_cost_return_transportation
+        # Calculate the total cost
         total_cost = total_cost_transportation_both + total_cost_hotel + total_cost_food
 
-        # Fitness is the inverse of the cost, as we want to minimize the cost
-        fitness = 1 / (1 + total_cost)
-        return fitness
+        return total_cost
 
-    def crossover(self, parent1, parent2):
-        # Randomly choose a crossover point
-        crossover_point = random.randint(1, min(len(parent1), len(parent2)) - 1)
-
-        # Create two children by swapping the genetic material of parents at the crossover point
-        child1 = parent1[:crossover_point] + parent2[crossover_point:]
-        child2 = parent2[:crossover_point] + parent1[crossover_point:]
-
-        return child1, child2
-
-    def mutate(self, itinerary):
-        mutated_itinerary = copy.deepcopy(itinerary)
+    def generate_neighbor(self, itinerary):
+        # Generate a neighbor itinerary by making small random changes
+        neighbor = copy.deepcopy(itinerary)
 
         # Randomly choose an item to mutate
-        mutation_point = random.randint(0, len(mutated_itinerary) - 1)
+        mutation_point = random.randint(0, len(neighbor) - 1)
 
         # Mutate the chosen item (replace it with a new randomly generated item)
-        mutated_itinerary[mutation_point] = self.model.generate_itinerary(self.data['num_travelers'],
-                                                                         self.data['start_location'],
-                                                                         self.data['destination'],
-                                                                         self.data['budget'],
-                                                                         self.data['date_of_departure'],
-                                                                         self.data['date_of_return'],
-                                                                         self.data['duration_of_stay'],
-                                                                         self.data['transportationType'])[mutation_point]
+        neighbor[mutation_point] = self.model.generate_itinerary(self.data['num_travelers'],
+                                                                 self.data['start_location'],
+                                                                 self.data['destination'],
+                                                                 self.data['budget'],
+                                                                 self.data['date_of_departure'],
+                                                                 self.data['date_of_return'],
+                                                                 self.data['duration_of_stay'],
+                                                                 self.data['transportationType'])[mutation_point]
 
-        return mutated_itinerary
+        return neighbor
 
-    def select_parents(self, population):
-        # Tournament selection: Randomly select two individuals, and choose the one with higher fitness
-        parent1 = random.choice(population)
-        parent2 = random.choice(population)
-
-        if self.calculate_fitness(parent1) > self.calculate_fitness(parent2):
-            return parent1
+    def accept_neighbor(self, current_cost, neighbor_cost, temperature):
+        # Accept the neighbor itinerary based on the Metropolis criterion
+        if neighbor_cost < current_cost:
+            return True
         else:
-            return parent2
+            probability = math.exp(-(neighbor_cost - current_cost) / temperature)
+            return random.random() < probability
 
-    def evolve_population(self, population):
-        new_population = []
+    def anneal(self):
+        # Initialize current solution
+        current_solution = self.model.generate_itinerary(self.data['num_travelers'], self.data['start_location'],
+                                                         self.data['destination'], self.data['budget'],
+                                                         self.data['date_of_departure'], self.data['date_of_return'],
+                                                         self.data['duration_of_stay'], self.data['transportationType'])
 
-        for _ in range(self.population_size):
-            # Select parents for crossover
-            parent1 = self.select_parents(population)
-            parent2 = self.select_parents(population)
+        # Initialize best solution
+        best_solution = current_solution
 
-            # Perform crossover with a certain probability
-            if random.random() < self.crossover_probability:
-                child1, child2 = self.crossover(parent1, parent2)
-            else:
-                # If no crossover, children are identical to parents
-                child1, child2 = parent1, parent2
+        # Initialize current cost
+        current_cost = self.calculate_cost(current_solution)
 
-            # Perform mutation with a certain probability
-            if random.random() < self.mutation_probability:
-                child1 = self.mutate(child1)
-            if random.random() < self.mutation_probability:
-                child2 = self.mutate(child2)
+        # Initialize best cost
+        best_cost = current_cost
 
-            # Add the children to the new population
-            new_population.append(child1)
-            new_population.append(child2)
+        # Initialize temperature
+        temperature = self.initial_temperature
 
-        return new_population
+        # Annealing process
+        for _ in range(self.num_iterations):
+            # Generate a neighbor solution
+            neighbor_solution = self.generate_neighbor(current_solution)
 
-    def run_genetic_algorithm(self):
-        # Initialize the initial population
-        population = self.initialize_population()
+            # Calculate the cost of the neighbor solution
+            neighbor_cost = self.calculate_cost(neighbor_solution)
 
-        for generation in range(self.generations):
-            # Evaluate the fitness of each individual in the population
-            fitness_scores = [self.calculate_fitness(individual) for individual in population]
+            # Accept or reject the neighbor solution
+            if self.accept_neighbor(current_cost, neighbor_cost, temperature):
+                current_solution = neighbor_solution
+                current_cost = neighbor_cost
 
-            # Select the best individuals to be parents for the next generation
-            elite_indices = sorted(range(len(fitness_scores)), key=lambda k: fitness_scores[k], reverse=True)[:2]
-            elite_parents = [population[i] for i in elite_indices]
+                # Update the best solution if necessary
+                if current_cost < best_cost:
+                    best_solution = current_solution
+                    best_cost = current_cost
 
-            # Create the next generation using crossover and mutation
-            population = self.evolve_population(population)
+            # Cool down the temperature
+            temperature *= 1 - self.cooling_rate
 
-            # Preserve the elite parents in the new population
-            population[0] = elite_parents[0]
-            population[1] = elite_parents[1]
-
-            # Print the best itinerary and its corresponding cost for each generation
-            best_fitness = max(fitness_scores)
-            best_index = fitness_scores.index(best_fitness)
-            best_itinerary = population[best_index]
-
-        # Return the best itinerary from the final population
-        best_fitness = max(fitness_scores)
-        best_index = fitness_scores.index(best_fitness)
-        best_itinerary = population[best_index]
-
-        return best_itinerary
+        return best_solution
 
 
 # Input data from the command line argument
@@ -575,36 +654,32 @@ class ObjectIdEncoder(json.JSONEncoder):
 
 # Initialize the model
 model = TravelItineraryModel(attractions_data, hotels_data, restaurants_data, bus_data,
-                                   trains_data, flights_data, bus_data_return, trains_data_return, flights_data_return)
+                             trains_data, flights_data, bus_data_return, trains_data_return, flights_data_return)
 
-# Initialize the GeneticAlgorithm with the model and data
-genetic_algorithm = GeneticAlgorithm(model, data)
+# Initialize the SimulatedAnnealing with the model and data
+sa = SimulatedAnnealing(model, data)
 
-# Run the genetic algorithm to generate the best itinerary
-best_itinerary = genetic_algorithm.run_genetic_algorithm()
+# Run simulated annealing to generate the best itinerary
+best_itinerary = sa.anneal()
 
 # Calculate the total cost of the best itinerary
-total_cost_transportation = 0
-total_cost_return_transportation = 0
-total_cost_hotel = 0
-total_cost_food = 0
+total_cost = sa.calculate_cost(best_itinerary)
 
-for item in best_itinerary:
-    if isinstance(item, dict) and 'price' in item:
-        if item in bus_data + trains_data + flights_data:
-            total_cost_transportation += item['price'] * data["num_travelers"]
-        elif item in hotels_data:
-            total_cost_hotel += item['price'] * data["num_travelers"] * data["duration_of_stay"]
-        elif item in bus_data_return + trains_data_return + flights_data_return:
-            total_cost_return_transportation += item['price']
-        elif item in restaurants_data:
-            total_cost_food += item['price'] * data["num_travelers"]
+# Calculate the transportation cost separately
+total_cost_transportation = sum(item['price'] for item in best_itinerary if item in model.bus_data + model.trains_data + model.flights_data)
 
+total_cost_return_transportation = sum(item['price'] for item in best_itinerary if item in model.bus_data_return + model.trains_data_return + model.flights_data_return)
+
+# Calculate the hotel cost separately
+total_cost_hotel = sum(item['price'] * data["num_travelers"] * data["duration_of_stay"] for item in best_itinerary if item in model.hotels_data)
+
+# Calculate the food cost separately
+total_cost_food = sum(item['price'] * data["num_travelers"] for item in best_itinerary if item in model.restaurants_data)
+
+# Calculate the total transportation cost (both ways)
 total_cost_transportation_both = total_cost_transportation + total_cost_return_transportation
-# Calculate the total cost
-total_cost = total_cost_transportation + total_cost_return_transportation + total_cost_hotel + total_cost_food
 
-# Create a dictionary containing the final itinerary and calculations
+# Create a dictionary containing the final itinerary and total cost
 result = {
     'itinerary': {
         'transportation': [item for item in best_itinerary if item in model.bus_data + model.trains_data + model.flights_data],
@@ -621,8 +696,8 @@ result = {
     }
 }
 
-# Serialize the final itinerary result using the custom JSON encoder
+# Serialize the final result using the custom JSON encoder
 final_result = json.dumps(result, cls=ObjectIdEncoder)
 
-# Send the final itinerary result to the client
+# Send the final result to the client
 print(final_result)
