@@ -102,7 +102,7 @@ const Itinerary = () => {
         const selectedHotelPrice = selectedHotel ? selectedHotel.price : 0;
         const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
 
-        const totalTransportationCost = itineraryData?.total_cost.transportation || 0;
+        const totalTransportationCost = itineraryData?.total_cost.total_cost_transportation_both || 0;
         const totalHotelCost = selectedHotelPrice;
         const totalFoodCost = selectedRestaurantPrice;
         const totalCost = totalTransportationCost + totalHotelCost + totalFoodCost;
@@ -268,7 +268,7 @@ const Itinerary = () => {
             </div>
             <hr />
             <h1 className='all-sub-head'>Estimated Cost (INR)</h1>
-            <p>Transportation: {itineraryData?.total_cost.transportation}</p>
+            <p>Transportation: {totalTransportationCost}</p>
             <p>Hotel: {selectedHotel ? selectedHotel.price : 0}</p>
             <p>Food: {selectedRestaurant ? selectedRestaurant.price : 0}</p>
             <p>Total Cost: {totalCost}</p>

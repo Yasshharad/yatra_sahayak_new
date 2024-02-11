@@ -39,7 +39,6 @@ function PlanTrip() {
             setItineraryData(response.data);
             toast.success('Your Itinerary is generated successfully.');
             console.log(itineraryData);
-            setError(null);
             setTimeout(() => {
                 navigate('/Itinerary', { state: { itineraryData: response.data } });
             }, 4000);
