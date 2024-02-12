@@ -163,8 +163,8 @@ class TravelItineraryModel:
 
 
 class GeneticAlgorithm:
-    def __init__(self, model, data, population_size=30,
-                 generations=10, crossover_probability=0.9, mutation_probability=0.2):
+    def __init__(self, model, data, population_size=50,
+                 generations=15, crossover_probability=0.9, mutation_probability=0.2):
         self.model = model
         self.data = data
         self.population_size = population_size
