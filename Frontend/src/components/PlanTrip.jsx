@@ -146,7 +146,6 @@ function PlanTrip() {
                     <div>
                         <select className='drop-down' name="start_location" required>
                             <option value="">Select City</option>
-                            {/* <option value="Ahamdabad" name="start_location">Ahamdabad</option> */}
                             <option value="Bengaluru" name="start_location">Bengaluru</option>
                             <option value="Delhi" name="start_location">Delhi</option>
                             <option value="Indore" name="start_location">Indore</option>

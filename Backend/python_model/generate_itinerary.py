@@ -5,44 +5,58 @@ import random
 from bson.objectid import ObjectId
 import copy
 
+# Input data from the command line argument
+data = json.loads(sys.argv[1])
+
+destination = data['destination']
+start_location = data['start_location']
+
+class ObjectIdEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return json.JSONEncoder.default(self, obj)
+    
 # MongoDB client initialization
 client = pymongo.MongoClient("mongodb+srv://Yatra:Yatra@yatrasahayak.0gw5pwg.mongodb.net/?retryWrites=true&w=majority")
 
 # MongoDB collections
 attraction_db = client["Attractions"]
-attractions_collection = attraction_db["attractions_in_mumbai"]
+attractions_collection = attraction_db[f"attractions_in_{destination}"]
 attractions_data = list(attractions_collection.find({}))
 
 hotel_db = client["Hotels"]
-hotels_collection = hotel_db["Hotels_in_Mumbai"]
+hotels_collection = hotel_db[f"Hotels_in_{destination}"]
 hotels_data = list(hotels_collection.find({}))
 
 restaurant_db = client["Restaurants"]
-restaurants_collection = restaurant_db["restaurants_in_mumbai"]
+restaurants_collection = restaurant_db[f"restaurants_in_{destination}"]
 restaurants_data = list(restaurants_collection.find({}))
 
-bus_db = client["Buses"]
-bus_collection = bus_db["buses"]
+# bus_db = client["Buses"]
+bus_db = client["Bus"]
+bus_collection = bus_db[f"{start_location}_{destination}"]
 bus_data = list(bus_collection.find({}))
 
-train_db = client["Trains"]
-trains_collection = train_db["trains"]
-trains_data = list(trains_collection.find({}))
-
-flight_db = client["Flights"]
-flights_collection = flight_db["flights"]
-flights_data = list(flights_collection.find({}))
-
-return_bus_db = client["Buses_return"]
-return_bus_collection = return_bus_db["Buses_return"]
+# return_bus_db = client["Buses_return"]
+return_bus_db = client["Bus_return"]
+return_bus_collection = return_bus_db[f"{destination}_{start_location}"]
 bus_data_return = list(return_bus_collection.find({}))
 
+train_db = client["Trains"]
+trains_collection = train_db[f"{start_location}_{destination}"]
+trains_data = list(trains_collection.find({}))
+
 return_train_db = client["Trains_return"]
-return_trains_collection = return_train_db["trains_return"]
+return_trains_collection = return_train_db[f"{destination}_{start_location}"]
 trains_data_return = list(return_trains_collection.find({}))
 
+flight_db = client["Flights"]
+flights_collection = flight_db[f"{start_location}_{destination}"]
+flights_data = list(flights_collection.find({}))
+
 return_flight_db = client["Flights_return"]
-return_flights_collection = return_flight_db["flights_return"]
+return_flights_collection = return_flight_db[f"{destination}_{start_location}"]
 flights_data_return = list(return_flights_collection.find({}))
 
 
@@ -139,7 +153,7 @@ class TravelItineraryModel:
 
         # Add the outward and return transportation, hotels, restaurants, and attractions to the itinerary
         itinerary.append(outward_transportation)
-        itinerary.extend(random.sample(hotels, min(2 * duration_of_stay, len(hotels))))
+        itinerary.extend(random.sample(hotels, min(4 * duration_of_stay, len(hotels))))
         itinerary.extend(random.sample(restaurants, min(4 * duration_of_stay, len(restaurants))))
         itinerary.extend(attractions)
         itinerary.append(return_transportation)
@@ -149,8 +163,8 @@ class TravelItineraryModel:
 
 
 class GeneticAlgorithm:
-    def __init__(self, model, data, population_size=50,
-                 generations=10, crossover_probability=0.8, mutation_probability=0.2):
+    def __init__(self, model, data, population_size=30,
+                 generations=10, crossover_probability=0.9, mutation_probability=0.2):
         self.model = model
         self.data = data
         self.population_size = population_size
@@ -307,16 +321,6 @@ class GeneticAlgorithm:
         return best_itinerary
 
 
-# Input data from the command line argument
-data = json.loads(sys.argv[1])
-
-
-class ObjectIdEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        return json.JSONEncoder.default(self, obj)
-
 
 # Initialize the model
 model = TravelItineraryModel(attractions_data, hotels_data, restaurants_data, bus_data,
@@ -390,44 +394,58 @@ print(final_result)
 # import math
 # from bson.objectid import ObjectId
 
+# # Input data from the command line argument
+# data = json.loads(sys.argv[1])
+
+# destination = data['destination']
+# start_location = data['start_location']
+
+# class ObjectIdEncoder(json.JSONEncoder):
+#     def default(self, obj):
+#         if isinstance(obj, ObjectId):
+#             return str(obj)
+#         return json.JSONEncoder.default(self, obj)
+    
 # # MongoDB client initialization
 # client = pymongo.MongoClient("mongodb+srv://Yatra:Yatra@yatrasahayak.0gw5pwg.mongodb.net/?retryWrites=true&w=majority")
 
 # # MongoDB collections
 # attraction_db = client["Attractions"]
-# attractions_collection = attraction_db["attractions_in_mumbai"]
+# attractions_collection = attraction_db[f"attractions_in_{destination}"]
 # attractions_data = list(attractions_collection.find({}))
 
 # hotel_db = client["Hotels"]
-# hotels_collection = hotel_db["Hotels_in_Mumbai"]
+# hotels_collection = hotel_db[f"Hotels_in_{destination}"]
 # hotels_data = list(hotels_collection.find({}))
 
 # restaurant_db = client["Restaurants"]
-# restaurants_collection = restaurant_db["restaurants_in_mumbai"]
+# restaurants_collection = restaurant_db[f"restaurants_in_{destination}"]
 # restaurants_data = list(restaurants_collection.find({}))
 
-# bus_db = client["Buses"]
-# bus_collection = bus_db["buses"]
+# # bus_db = client["Buses"]
+# bus_db = client["Bus"]
+# bus_collection = bus_db[f"{start_location}_{destination}"]
 # bus_data = list(bus_collection.find({}))
 
-# train_db = client["Trains"]
-# trains_collection = train_db["trains"]
-# trains_data = list(trains_collection.find({}))
-
-# flight_db = client["Flights"]
-# flights_collection = flight_db["flights"]
-# flights_data = list(flights_collection.find({}))
-
-# return_bus_db = client["Buses_return"]
-# return_bus_collection = return_bus_db["Buses_return"]
+# # return_bus_db = client["Buses_return"]
+# return_bus_db = client["Bus_return"]
+# return_bus_collection = return_bus_db[f"{destination}_{start_location}"]
 # bus_data_return = list(return_bus_collection.find({}))
 
+# train_db = client["Trains"]
+# trains_collection = train_db[f"{start_location}_{destination}"]
+# trains_data = list(trains_collection.find({}))
+
 # return_train_db = client["Trains_return"]
-# return_trains_collection = return_train_db["trains_return"]
+# return_trains_collection = return_train_db[f"{destination}_{start_location}"]
 # trains_data_return = list(return_trains_collection.find({}))
 
+# flight_db = client["Flights"]
+# flights_collection = flight_db[f"{start_location}_{destination}"]
+# flights_data = list(flights_collection.find({}))
+
 # return_flight_db = client["Flights_return"]
-# return_flights_collection = return_flight_db["flights_return"]
+# return_flights_collection = return_flight_db[f"{destination}_{start_location}"]
 # flights_data_return = list(return_flights_collection.find({}))
 
 
@@ -516,7 +534,7 @@ print(final_result)
 
 #         # Add the outward and return transportation, hotels, restaurants, and attractions to the itinerary
 #         itinerary.append(outward_transportation)
-#         itinerary.extend(random.sample(hotels, min(4 * duration_of_stay, len(hotels))))
+#         itinerary.extend(random.sample(hotels, min(2 * duration_of_stay, len(hotels))))
 #         itinerary.extend(random.sample(restaurants, min(4 * duration_of_stay, len(restaurants))))
 #         itinerary.extend(attractions)
 #         itinerary.append(return_transportation)
@@ -527,7 +545,7 @@ print(final_result)
 
 
 # class SimulatedAnnealing:
-#     def __init__(self, model, data, initial_temperature=1000, cooling_rate=0.01, num_iterations=10):
+#     def __init__(self, model, data, initial_temperature=2000, cooling_rate=0.001, num_iterations=1000):
 #         self.model = model
 #         self.data = data
 #         self.initial_temperature = initial_temperature
@@ -667,17 +685,6 @@ print(final_result)
 #             temperature *= 1 - self.cooling_rate
 
 #         return best_solution
-
-
-
-# # Input data from the command line argument
-# data = json.loads(sys.argv[1])
-
-# class ObjectIdEncoder(json.JSONEncoder):
-#     def default(self, obj):
-#         if isinstance(obj, ObjectId):
-#             return str(obj)
-#         return json.JSONEncoder.default(self, obj)
 
 # # Initialize the model
 # model = TravelItineraryModel(attractions_data, hotels_data, restaurants_data, bus_data,
