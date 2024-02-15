@@ -20,25 +20,51 @@ function PlanTrip() {
     const [success, setSuccess] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    // State variables for form fields
+    const [start_location, setStart_location] = useState('');
+    const [destination, setDestination] = useState('');
+    const [date_of_departure, setDate_of_departure] = useState('');
+    const [date_of_return, setDate_of_return] = useState('');
+    const [duration_of_stay, setDuration_of_stay] = useState(1);
+    const [budget, setBudget] = useState('');
+    const [num_travelers, setNum_travelers] = useState(1);
+    const [selectedBudget, setSelectedBudget] = useState(null);
+    const [selectedNumTravelers, setSelectedNumTravelers] = useState(null);
+
+
+    const handleTransportationChange = (event) => {
+        setTransportationType(event.target.value);
+    };
+
+    const handleBudget = (value) => {
+        setBudget(value);
+    };
+
+    const handleNum_travelers = (value) => {
+        setNum_travelers(value);
+    };
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
         const formData = new FormData(e.target);
         const requestData = Object.fromEntries(formData.entries());
-        console.log(requestData);
 
-        requestData.budget = parseInt(requestData.budget, 10);
-        requestData.num_travelers = parseInt(requestData.num_travelers, 10);
-        requestData.duration_of_stay = parseInt(requestData.duration_of_stay, 10);
-        requestData.date_of_departure = formatDateToDDMMYYYY(requestData.date_of_departure);
-        requestData.date_of_return = formatDateToDDMMYYYY(requestData.date_of_return);
+        requestData.budget = budget; // Set budget value
+        requestData.num_travelers = num_travelers; // Set number of travelers value
+        requestData.duration_of_stay = duration_of_stay; // Set duration of stay value
+        requestData.date_of_departure = formatDateToDDMMYYYY(date_of_departure);
+        requestData.date_of_return = formatDateToDDMMYYYY(date_of_return);
 
         try {
             const response = await axios.post('http://localhost:4000/generate-itinerary', requestData);
             setItineraryData(response.data);
             toast.success('Your Itinerary is generated successfully.');
-            console.log(itineraryData);
+            console.log(requestData);
             setTimeout(() => {
                 navigate('/Itinerary', { state: { itineraryData: response.data } });
             }, 4000);
@@ -48,63 +74,6 @@ function PlanTrip() {
         } finally {
             setIsLoading(false);
         }
-    };
-    const [start_location, setStart_location] = useState('');
-    const handleStart_location = (event) => {
-        setStart_location(event.target.value);
-    };
-
-    const [destination, setDestination] = useState('');
-    const handleDestination = (event) => {
-        setDestination(event.target.value);
-    };
-
-    //Date
-    const [date_of_departure, setDate_of_departure] = useState('');
-    const [date_of_return, setDate_of_return] = useState('');
-
-    //Count Days
-    const [duration_of_stay, setDuration_of_stay] = useState(1);
-
-    const handleIncrement = () => {
-        setDuration_of_stay(prevDuration_of_stay => prevDuration_of_stay + 1);
-    };
-
-    const handleDecrement = () => {
-        if (duration_of_stay > 1) {
-            setDuration_of_stay(prevDuration_of_stay => prevDuration_of_stay - 1);
-        }
-    };
-
-    //Price
-    const [budget, setBudget] = useState('');
-
-    const handleChange = (event) => {
-        const inputValue = event.target.value;
-        if (/^\d*$/.test(inputValue)) {
-            setBudget(Number(inputValue));
-        }
-    };
-
-
-    //No of people
-    const [num_travelers, setNum_travelers] = useState(1);
-
-    const handleNum_travelers = (event) => {
-        const num_travelers = event.target.value;
-
-        // Validate the input value.
-        if (num_travelers < 0) {
-            // Set the value of the input field to 0.
-            event.target.value = 0;
-        } else if (num_travelers > 15) {
-            // Set the value of the input field to 15.
-            event.target.value = 15;
-        }
-    };
-
-    const handleTransportationChange = (event) => {
-        setTransportationType(event.target.value);
     };
 
     // Create a new state variable to store the minimum date (tomorrow)
@@ -132,6 +101,7 @@ function PlanTrip() {
             const timeDifference = returnDate.getTime() - departureDate.getTime();
             const duration = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Calculate days
             setCalculatedDuration(duration);
+            setDuration_of_stay(duration);
         }
     }, [date_of_departure, date_of_return]);
 
@@ -210,14 +180,14 @@ function PlanTrip() {
 
                     <hr />
 
-                    <p className='mid-text'>How many days are you planning to travel ?</p>
+                    {/* <p className='mid-text'>How many days are you planning to travel ?</p> */}
                     <div className='day-count'>
-                        <p>Days:</p>
-                        <input type="text" name="duration_of_stay" value={calculatedDuration} readOnly />
+                        {/* <p>Days:</p> */}
+                        <input type="hidden" name="duration_of_stay" value={calculatedDuration} readOnly />
                     </div>
                     <hr />
 
-                    <p className='mid-text'>What's your budget ?</p>
+                    {/* <p className='mid-text'>What's your budget ?</p>
                     <p>The budget is exclusively allocated for travelling and dining purposes.</p>
 
                     <input
@@ -226,12 +196,30 @@ function PlanTrip() {
                         type="text"
                         onChange={handleChange}
                         required
-                    />
+                    /> */}
+                    <p className='mid-text'>What's your budget?</p>
+                    <p>The budget is exclusively allocated for travelling and dining purposes.</p>
+
+                    <div className='budget-options'>
+                        <div className={`option-card ${budget === 20000 ? 'selected' : ''}`} onClick={() => handleBudget(20000)}>
+                            <p>Low</p>
+                            <span>&#8377; 0-20000</span>
+                        </div>
+                        <div className={`option-card ${budget === 50000 ? 'selected' : ''}`} onClick={() => handleBudget(50000)}>
+                            <p>Medium</p>
+                            <span>&#8377; 20000-50000</span>
+                        </div>
+                        <div className={`option-card ${budget === 75000 ? 'selected' : ''}`} onClick={() => handleBudget(75000)}>
+                            <p>High</p>
+                            <span>&#8377; 50000+</span>
+                        </div>
+                    </div>
+
 
 
                     <hr />
 
-                    <p className='mid-text'>What is the number of people travelling ?</p>
+                    {/* <p className='mid-text'>What is the number of people travelling ?</p>
                     <div className='people-count'>
                         <input
                             id="num_travelers"
@@ -242,7 +230,23 @@ function PlanTrip() {
                             min="0"
                             max="15"
                         />
+                    </div> */}
+                    <p className='mid-text'>With whom are you plannig to travel?</p>
+                    <div className='people-options'>
+                        <div className={`option-card ${num_travelers === 1 ? 'selected' : ''}`} onClick={() => handleNum_travelers(1)}>
+                            <p>Solo</p>
+                        </div>
+                        <div className={`option-card ${num_travelers === 2 ? 'selected' : ''}`} onClick={() => handleNum_travelers(2)}>
+                            <p>Couple</p>
+                        </div>
+                        <div className={`option-card ${num_travelers === 3 ? 'selected' : ''}`} onClick={() => handleNum_travelers(3)}>
+                            <p>Family</p>
+                        </div>
+                        <div className={`option-card ${num_travelers === 4 ? 'selected' : ''}`} onClick={() => handleNum_travelers(4)}>
+                            <p>Friends</p>
+                        </div>
                     </div>
+
 
                 </section>
 

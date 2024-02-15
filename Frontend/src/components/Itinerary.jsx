@@ -102,9 +102,9 @@ const Itinerary = () => {
         const selectedHotelPrice = selectedHotel ? selectedHotel.price : 0;
         const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
 
-        const totalTransportationCost = itineraryData?.total_cost.total_cost_transportation_both || 0;
-        const totalHotelCost = selectedHotelPrice;
-        const totalFoodCost = selectedRestaurantPrice;
+        const totalTransportationCost = itineraryData?.total_cost.transportation || 0;
+        const totalHotelCost = selectedHotelPrice * itineraryData?.input_data?.duration_of_stay * itineraryData?.input_data?.num_travelers;
+        const totalFoodCost = selectedRestaurantPrice * itineraryData?.input_data?.num_travelers;
         const totalCost = totalTransportationCost + totalHotelCost + totalFoodCost;
 
         toast.success('confirming the itinerary.', { autoClose: 3000 });
@@ -126,8 +126,8 @@ const Itinerary = () => {
     const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
 
     const totalTransportationCost = itineraryData?.total_cost.transportation || 0;
-    const totalHotelCost = selectedHotelPrice;
-    const totalFoodCost = selectedRestaurantPrice;
+    const totalHotelCost = selectedHotelPrice * itineraryData?.input_data?.duration_of_stay * itineraryData?.input_data?.num_travelers;
+    const totalFoodCost = selectedRestaurantPrice * itineraryData?.input_data?.num_travelers;
     const totalCost = totalTransportationCost + totalHotelCost + totalFoodCost;
 
 
@@ -267,11 +267,13 @@ const Itinerary = () => {
                 </div>
             </div>
             <hr />
-            <h1 className='all-sub-head'>Estimated Cost (INR)</h1>
-            <p>Transportation: {totalTransportationCost}</p>
-            <p>Hotel: {selectedHotel ? selectedHotel.price : 0}</p>
-            <p>Food: {selectedRestaurant ? selectedRestaurant.price : 0}</p>
-            <p>Total Cost: {totalCost}</p>
+            <div className='Costs'>
+                <h1 className='head_name'>Estimated Cost (INR)</h1>
+                <p>Transportation: {totalTransportationCost}</p>
+                <p>Hotel: {totalHotelCost}</p>
+                <p>Food: {totalFoodCost}</p>
+                <p>Total Cost: {totalCost}</p>
+            </div>
 
             <hr />
 

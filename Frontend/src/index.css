@@ -168,9 +168,15 @@ select {
     padding-right: 20px;
 }
 
+.option-card.selected {
+    background-color: rgb(209, 209, 209);
+    border: 1px solid rgb(0, 0, 0);
+}
+
 .datePickerDiv {
     display: flex;
     justify-content: space-between;
+    gap: 50px;
 }
 
 .Date {
@@ -243,6 +249,46 @@ input {
     color: grey;
     padding-right: 20px;
     margin-bottom: 5%;
+}
+
+.budget-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.people-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.option-card {
+    width: calc(25% - 10px);
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.option-card:hover {
+    background-color: #e0e0e0;
+}
+
+.option-card p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.option-card span {
+    display: block;
+    font-size: 20px;
+    margin-top: 5px;
+    text-align: center;
 }
 
 .submit {
@@ -588,6 +634,46 @@ input {
     background-color: #ee9996;
 }
 
+.Costs {
+    border: 2px solid #e17b77;
+    border-radius: 5px;
+    padding: 20px;
+    width: 500px;
+    margin: 30px auto -40px auto;
+    background-color: #f9f9f9;
+    box-shadow: 0 5px 10px #e17b77;
+}
+
+.head_name {
+    font-size: 20px;
+    color: #e17b77;
+}
+
+p {
+    margin: 10px 0;
+    color: #555;
+}
+
+p:first-child {
+    margin-top: 0;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+.totalCost {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Responsive Styling */
+@media only screen and (max-width: 500px) {
+    .Costs {
+        width: 90%;
+    }
+}
+
 
 /* Restaurants */
 
@@ -752,9 +838,11 @@ b {
 }
 
 .link-button1 {
-    display: block;
+    display: flex;
     text-align: center;
+    justify-content: center;
     padding: 50px;
+    gap: 20px;
 }
 
 .btn-hover {
@@ -780,6 +868,8 @@ b {
     color: #fff;
     padding: 10px 20px;
     border-radius: 5px;
+    height: 40px;
+    font-weight: 600;
     transition: background-color 0.3s ease;
     border: none;
 }

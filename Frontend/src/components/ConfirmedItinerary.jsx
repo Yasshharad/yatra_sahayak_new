@@ -66,9 +66,12 @@ const ConfirmedItinerary = () => {
     }
 
     // Calculate costs for ConfirmedItinerary
+    const selectedHotelPrice = selectedHotel ? selectedHotel.price : 0;
+    const selectedRestaurantPrice = selectedRestaurant ? selectedRestaurant.price : 0;
+
     const totalTransportationCost = itineraryData?.total_cost.transportation || 0;
-    const totalHotelCost = selectedHotel ? selectedHotel.price : 0;
-    const totalFoodCost = selectedRestaurant ? selectedRestaurant.price : 0;
+    const totalHotelCost = selectedHotelPrice * itineraryData?.input_data?.duration_of_stay * itineraryData?.input_data?.num_travelers;
+    const totalFoodCost = selectedRestaurantPrice * itineraryData?.input_data?.num_travelers;
     const totalCost = totalTransportationCost + totalHotelCost + totalFoodCost;
 
     return (
@@ -165,11 +168,13 @@ const ConfirmedItinerary = () => {
                 </div>
             </div>
             <hr />
-            <h1 className='all-sub-head'>Estimated Cost (INR)</h1>
-            <p>Transportation: {totalTransportationCost}</p>
-            <p>Hotel: {totalHotelCost}</p>
-            <p>Food: {totalFoodCost}</p>
-            <p>Total Cost: {totalCost}</p>
+            <div className='Costs'>
+                <h1 className='head_name'>Estimated Cost (INR)</h1>
+                <p>Transportation: {totalTransportationCost}</p>
+                <p>Hotel: {totalHotelCost}</p>
+                <p>Food: {totalFoodCost}</p>
+                <p>Total Cost: {totalCost}</p>
+            </div>
             <hr />
             <div className="link-button1">
                 <a href="/plan">Generate Again</a> <span />

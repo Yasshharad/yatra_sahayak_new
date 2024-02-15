@@ -47,13 +47,24 @@ yatra.post('/generate-itinerary', (req, res) => {
   const inputData = req.body;
   const pythonProcess = spawn('python', ['./python_model/generate_itinerary.py', JSON.stringify(inputData)]);
 
+  let rawData = '';
   pythonProcess.stdout.on('data', (data) => {
-    const result = JSON.parse(data);
-    res.json(result);
+    rawData += data.toString(); // Accumulate the data
+  });
+
+  pythonProcess.stdout.on('end', () => {
+    try {
+      const result = JSON.parse(rawData); // Parse the accumulated data
+      res.json(result);
+    } catch (error) {
+      console.error(`Error parsing JSON: ${error}`);
+      res.status(500).json({ error: 'An error occurred while generating the itinerary.' });
+    }
   });
 
   pythonProcess.stderr.on('data', (data) => {
-    console.error(`Error = Python script: ${data}`);
+    console.error(`Error: ${data}`);
     res.status(500).json({ error: 'An error occurred while generating the itinerary.' });
   });
 });
+

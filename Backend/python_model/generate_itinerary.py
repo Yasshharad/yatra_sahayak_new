@@ -8,9 +8,12 @@ import copy
 # Input data from the command line argument
 data = json.loads(sys.argv[1])
 
+
 destination = data['destination']
 start_location = data['start_location']
-
+num_travelers = data['num_travelers']
+duration_of_stay = data['duration_of_stay']                                                                       
+                                                            
 class ObjectIdEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, ObjectId):
@@ -153,7 +156,7 @@ class TravelItineraryModel:
 
         # Add the outward and return transportation, hotels, restaurants, and attractions to the itinerary
         itinerary.append(outward_transportation)
-        itinerary.extend(random.sample(hotels, min(4 * duration_of_stay, len(hotels))))
+        itinerary.extend(random.sample(hotels, min(2 * duration_of_stay, len(hotels))))
         itinerary.extend(random.sample(restaurants, min(4 * duration_of_stay, len(restaurants))))
         itinerary.extend(attractions)
         itinerary.append(return_transportation)
@@ -375,6 +378,12 @@ result = {
         'hotel': total_cost_hotel,
         'food': total_cost_food,
         'total': total_cost
+    },
+    'input_data':{
+        'destination': destination,
+        'start_location': start_location,
+        'num_travelers': num_travelers,
+        'duration_of_stay': duration_of_stay
     }
 }
 
