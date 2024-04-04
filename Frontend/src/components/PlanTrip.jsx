@@ -105,12 +105,29 @@ function PlanTrip() {
         }
     }, [date_of_departure, date_of_return]);
 
+    function calculateMaxReturnDate(departureDate) {
+        const maxReturnDate = new Date(departureDate);
+        maxReturnDate.setDate(maxReturnDate.getDate() + 14); // Add 14 days to departure date
+        return maxReturnDate.toISOString().split('T')[0]; // Format the date as ISO date string
+    }
+
+
     return (
         <div className='container'>
             <form onSubmit={handleSubmit}>
                 <section className='trip-content'>
 
                     <h1>Tell us your travel preferences</h1>
+
+                    <p className='mid-text'>What is destination of choice ?</p>
+                    <div>
+                        <select className='drop-down' name="destination" required>
+                            <option value="">Select City</option>
+                            <option value="Mumbai" name="destination">Mumbai</option>
+
+                        </select>
+                    </div>
+                    <hr />
 
                     <p className='mid-text'>What is the starting location ?</p>
                     <div>
@@ -127,6 +144,7 @@ function PlanTrip() {
 
                         </select>
                     </div>
+                    <hr />
                     <p className='mid-text'>What is the transportation preference ?</p>
                     <div>
                         <select
@@ -139,16 +157,6 @@ function PlanTrip() {
                             <option value="bus">Bus</option>
                             <option value="train">Train</option>
                             <option value="flight">Flight</option>
-                        </select>
-                    </div>
-                    <hr />
-
-                    <p className='mid-text'>What is destination of choice ?</p>
-                    <div>
-                        <select className='drop-down' name="destination" required>
-                            <option value="">Select City</option>
-                            <option value="Mumbai" name="destination">Mumbai</option>
-
                         </select>
                     </div>
                     <hr />
@@ -203,7 +211,7 @@ function PlanTrip() {
                     <div className='budget-options'>
                         <div className={`option-card ${budget === 20000 ? 'selected' : ''}`} onClick={() => handleBudget(20000)}>
                             <p>Low</p>
-                            <span>&#8377; 0-20000</span>
+                            <span>&#8377; 0-100000</span>
                         </div>
                         <div className={`option-card ${budget === 50000 ? 'selected' : ''}`} onClick={() => handleBudget(50000)}>
                             <p>Medium</p>
